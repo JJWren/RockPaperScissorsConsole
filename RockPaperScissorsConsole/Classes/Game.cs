@@ -1,27 +1,32 @@
-﻿namespace RockPaperScissorsConsole.Classes
+﻿using RockPaperScissorsConsole.Classes.CustomExtensions;
+
+namespace RockPaperScissorsConsole.Classes
 {
     public class Game
     {
         public int UserScore { get; set; } = 0;
         public int ComputerScore { get; set; } = 0;
         public int NumberOfTies { get; set; } = 0;
-        public string UserSelection { get; set; } = string.Empty;
-        public string ComputerSelection { get; set; } = string.Empty;
+        public int UserSelection { get; set; } = 0;
+        public int ComputerSelection { get; set; } = 0;
 
         public void Run()
         {
-            Console.WriteLine("Welcome to Rock, Paper, Scissors!\n");
+            Console.WriteLine("Welcome to Rock, Paper, Scissors!".ToBannerString());
 
-            int userSelection = GetUserSelection();
-            int computerSelection = GenerateComputerSelection();
-            CompareSelections(UserSelection, ComputerSelection);
+            UserSelection = GetUserSelection();
+            ComputerSelection = GenerateComputerSelection();
+            CompareSelections();
 
             PlayAgain();
         }
 
         public int GetUserSelection()
         {
-            Console.WriteLine($"1. {Constants.Selection.Rock}\n2. {Constants.Selection.Paper}\n3. {Constants.Selection.Scissors}\nType the number of your selection from the three choices above:\n");
+            Console.WriteLine($"1. {Constants.Selection.Rock}" +
+                $"\n2. {Constants.Selection.Paper}" +
+                $"\n3. {Constants.Selection.Scissors}" +
+                $"\nType the number of your selection from the three choices above:\n");
             string input = Console.ReadLine()!;
 
             int parsedInput = CheckUserSelectionIsValid(input);
@@ -35,20 +40,19 @@
 
         public static int CheckUserSelectionIsValid(string input)
         {
-            int userSelection;
-            bool success = int.TryParse(input, out userSelection);
+            bool success = int.TryParse(input, out int UserSelection);
 
             if (!success)
             {
                 return 0;
             }
 
-            if (userSelection < 1 || userSelection > 3)
+            if (UserSelection < 1 || UserSelection > 3)
             {
                 return 0;
             }
 
-            return userSelection;
+            return UserSelection;
         }
 
         public static int GenerateComputerSelection()
@@ -59,49 +63,38 @@
 
         public static string ConvertSelection(int selection)
         {
-            if (selection == 1)
-            {
-                return Constants.Selection.Rock.ToString();
-            }
-            else if (selection == 2)
-            {
-                return Constants.Selection.Paper.ToString();
-            }
-            else
-            {
-                return Constants.Selection.Scissors.ToString();
-            }
+            return ((Constants.Selection)selection).ToString();
         }
 
-        public void CompareSelections(int userSelection, int computerSelection)
+        public void CompareSelections()
         {
             // Print Selections
-            Console.WriteLine($"\nYour selection: {ConvertSelection(userSelection)}");
-            Console.WriteLine($"Computer's selection: {ConvertSelection(computerSelection)}");
+            Console.WriteLine($"\nYour selection: {ConvertSelection(UserSelection)}" +
+                $"\nComputer's selection: {ConvertSelection(ComputerSelection)}\n");
 
             // Ties
-            if (userSelection == computerSelection)
+            if (UserSelection == ComputerSelection)
             {
-                Console.WriteLine("It's tie!");
+                Console.WriteLine("It's tie!\n");
                 NumberOfTies += 1;
             }
             // User Wins
-            else if ((userSelection == 1 && computerSelection == 3)     // rock 🪨 vs scissors ✂
-                || (userSelection == 2 && computerSelection == 1)       // paper 📄 vs rock 🪨
-                || (userSelection == 3 && computerSelection == 2))      // scissors ✂ vs paper 📄
+            else if ((UserSelection == 1 && ComputerSelection == 3)     // rock vs scissors
+                || (UserSelection == 2 && ComputerSelection == 1)       // paper vs rock
+                || (UserSelection == 3 && ComputerSelection == 2))      // scissors vs paper
             {
-                Console.WriteLine("You win!");
+                Console.WriteLine("You win!\n");
                 UserScore += 1;
             }
             // Computer Wins
             else
             {
-                Console.WriteLine("You lose!");
+                Console.WriteLine("You lose!\n");
                 ComputerScore += 1;
             }
 
             // Print Scores
-            Console.WriteLine("\n## SCOREBOARD ##");
+            Console.WriteLine("SCOREBOARD".ToBannerString());
             Console.WriteLine($"You: {UserScore}\tComputer: {ComputerScore}\t Ties: {NumberOfTies}");
         }
 
@@ -113,11 +106,14 @@
             if (yesOrNo == "Y")
             {
                 Console.WriteLine("");
+                UserSelection = 0;
+                ComputerSelection = 0;
                 Run();
             }
             else
             {
                 Console.WriteLine("\nGoodbye!");
+                Environment.Exit(0);
             }
         }
     }
